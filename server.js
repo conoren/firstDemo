@@ -11,6 +11,9 @@ const flash = require('express-flash')
 const session = require('express-session')
 //const methodOverride = require('method-override')
 
+const bodyParser = require("body-parser")
+const cors = require("cors")
+
 const initializePassport = require('./passport-config') //Login miatt
 initializePassport(
   passport,
@@ -21,7 +24,7 @@ initializePassport(
 const users = []
 
 app.set('view-engine', 'ejs') 
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }))
 app.use(flash())
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -30,6 +33,9 @@ app.use(session({
 }))
 app.use(passport.initialize())
 app.use(passport.session())
+//requestek parsolására
+app.use(express.json())
+
 
 app.get('/', checkAuthenticated, (req, res) => {
     res.render('index.ejs', { name: req.user.name })
@@ -89,4 +95,33 @@ function checkNotAuthenticated(req, res, next) {
   next()
 }
   
+
+const {Client} = require('pg')
+
+const client = new Client({
+    user:"doadmin",
+    host: "db-toth-aron-do-user-7298387-0.b.db.ondigitalocean.com",
+    port: 25060,
+    password: process.env.PGPW,
+    ssl: { rejectUnauthorized: false },
+    database: "defaultdb"
+})
+
+//const pgdb = express()
+//const port = process.env.PORT || 5432
+
+client.connect();
+
+//pgdb.listen(PORT, console.log('server started'))
+
+client.query('Select * from users', (err,res)=>{
+    if(!err){
+        console.log(res.rows)
+    }
+    else{
+        console.log(err.message)
+    }
+    client.end;
+})
+
 app.listen(3000)
