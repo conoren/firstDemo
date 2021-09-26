@@ -6,16 +6,11 @@ const flash = require("express-flash");
 const session = require("express-session");
 const initializePassport = require("./passport-Config");
 const app = express();
-
 require("dotenv").config();
-
 const PORT =  3000;
-
-
 
 initializePassport(passport);
 
-// Middleware
 
 app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "ejs");
@@ -27,9 +22,7 @@ app.use(
     saveUninitialized: false
   })
 );
-// Funtion inside passport which initializes passport
 app.use(passport.initialize());
-// Store our variables to be persisted across the whole session. Works with app.use(Session) above
 app.use(passport.session());
 app.use(flash());
 
@@ -249,6 +242,18 @@ app.post("/login",
 
 app.get("/index", checkNotAuthenticated, (req, res) => {
   console.log(req.isAuthenticated());
+
+  const getAllEvents = (request, response) => {
+ 
+    pool.query('SELECT * FROM events ', (error, results) => {
+     if (error) {
+      throw error
+     }
+     response.status(200).json(results.rows)
+    })
+   }
+
+
   res.render('index.ejs', { name: req.user.name, events: req.pool})
 });
 
