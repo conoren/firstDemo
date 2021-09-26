@@ -4,28 +4,26 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 const flash = require("express-flash");
 const session = require("express-session");
-require("dotenv").config();
+const initializePassport = require("./passport-Config");
 const app = express();
+
+require("dotenv").config();
 
 const PORT =  3000;
 
-const initializePassport = require("./passport-Config");
+
 
 initializePassport(passport);
 
 // Middleware
 
-// Parses details from a form
 app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "ejs");
 
 app.use(
   session({
-    // Key we want to keep secret which will encrypt all of our information
     secret: process.env.SESSION_SECRET,
-    // Should we resave our session variables if nothing has changes which we dont
     resave: false,
-    // Save empty value if there is no vaue which we do not want to do
     saveUninitialized: false
   })
 );
@@ -39,24 +37,140 @@ app.get("/", (req, res) => {
   res.render("login.ejs");
 });
 
+app.get('/eventManger', checkNotAuthenticated, (req,res)=>{
+  res.render('eventManger.ejs')
+})
+app.post('/eventAdder', checkNotAuthenticated, (req,res)=>{
+  let { name, description} = req.body;
+
+  let errors = [];
+  let attenders = [];
+
+  console.log({
+    name,
+    description
+  });
+
+  if (!name || !description) {
+    errors.push({ message: "Please enter all fields" });
+  }
+
+  if (errors.length > 0) {
+    res.render("eventManager", { errors, name, description });
+  } else {
+    pool.query(
+      `INSERT INTO events (name, description, attenders)
+          VALUES ($1, $2, $3)
+          RETURNING name, description`,
+      [name, description, attenders],
+      (err, results) => {
+        if (err) {
+          throw err;
+        }
+        console.log(results.rows);
+        req.flash("success_msg", "Event added.");
+        res.redirect("/index");
+      }
+    );
+  }
+})
+app.post('/eventDeleter', checkNotAuthenticated, (req,res)=>{
+  let {name} = req.body;
+
+  let errors = [];
+
+  console.log({
+    name
+  });
+
+  if (!name) {
+    errors.push({ message: "Please enter the event name" });
+  }
+
+  if (errors.length > 0) {
+    res.render("eventManager", { errors, name });
+  } else {
+    pool.query(
+      `DELETE FROM events WHERE name=$1`,
+      [name],
+      (err, results) => {
+        if (err) {
+          throw err;
+        }
+        console.log(results.rows);
+        req.flash("success_msg", "Event deleted.");
+        res.redirect("/index");
+      }
+    );
+  }
+})
+app.post('/eventJoin',checkNotAuthenticated, (req,res)=>{
+  let {name, id} = req.body;
+
+  let errors = [];
+
+  console.log({
+    name,
+    id
+  });
+
+  if (!name) {
+    errors.push({ message: "Please enter the event name" });
+  }
+
+  if (errors.length > 0) {
+    res.render("index", { errors, name });
+  } else {
+    pool.query(
+      `UPDATE events SET attenders=$1 WHERE name=$2`,
+      [[id],name],
+      (err, results) => {
+        if (err) {
+          throw err;
+        }
+        console.log(results.rows);
+        req.flash("success_msg", "Joined.");
+        res.redirect("/index");
+      }
+    );
+  }
+})
+app.post('/eventLeave',checkNotAuthenticated, (req,res)=>{
+  let {name, id} = req.body;
+
+  let errors = [];
+
+  console.log({
+    name,
+    id
+  });
+
+  if (!name) {
+    errors.push({ message: "Please enter the event name" });
+  }
+
+  if (errors.length > 0) {
+    res.render("index", { errors, name });
+  } else {
+    pool.query(
+      `UPDATE events SET attenders=$1 WHERE name=$2`,
+      [[],name],
+      (err, results) => {
+        if (err) {
+          throw err;
+        }
+        console.log(results.rows);
+        req.flash("success_msg", "Left.");
+        res.redirect("/index");
+      }
+    );
+  }
+})
+
+
 app.get("/register", checkAuthenticated, (req, res) => {
   res.render("register.ejs");
 });
-
-app.get("/login", checkAuthenticated, (req, res) => {
-  res.render("login.ejs");
-});
-
-app.get("/index", checkNotAuthenticated, (req, res) => {
-  console.log(req.isAuthenticated());
-  res.render('index.ejs', { name: req.user.name })
-});
-
-app.get("/logout", (req, res) => {
-  req.logout();
-  res.render("login.ejs", { message: "You have logged out successfully" });
-});
-
 app.post("/register", async (req, res) => {
   let { name, email, password, password2 } = req.body;
 
@@ -122,6 +236,9 @@ app.post("/register", async (req, res) => {
   }
 });
 
+app.get("/login", checkAuthenticated, (req, res) => {
+  res.render("login.ejs");
+});
 app.post("/login",
   passport.authenticate("local", {
     successRedirect: "/index",
@@ -130,13 +247,23 @@ app.post("/login",
   })
 );
 
+app.get("/index", checkNotAuthenticated, (req, res) => {
+  console.log(req.isAuthenticated());
+  res.render('index.ejs', { name: req.user.name, events: req.pool})
+});
+
+app.get("/logout", (req, res) => {
+  req.logout();
+  res.render("login.ejs", { message: "You have logged out successfully" });
+});
+
+
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return res.redirect("/index");
   }
   next();
 }
-
 function checkNotAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
