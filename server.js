@@ -5,15 +5,17 @@ const passport = require("passport");
 const flash = require("express-flash");
 const session = require("express-session");
 const initializePassport = require("./passport-Config");
+const swaggerUi = require('swagger-ui-express')
+const swaggerFile = require('./swagger-output.json')
 const app = express();
 require("dotenv").config();
 const PORT =  3000;
-
 initializePassport(passport);
-
 
 app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "ejs");
+
+app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 app.use(
   session({
@@ -33,6 +35,7 @@ app.get("/", (req, res) => {
 app.get('/eventManger', checkNotAuthenticated, (req,res)=>{
   res.render('eventManger.ejs')
 })
+
 app.post('/eventAdder', checkNotAuthenticated, (req,res)=>{
   let { name, description} = req.body;
 
