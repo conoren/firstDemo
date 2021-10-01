@@ -1,5 +1,3 @@
-//require("./loginRoutes.js")
-//require("./eventRoutes.js")
 const express = require("express");
 const { pool, checkAuthenticated, checkNotAuthenticated } = require("../config/db.config");
 const bcrypt = require("bcrypt");
