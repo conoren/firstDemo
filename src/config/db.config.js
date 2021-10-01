@@ -11,4 +11,17 @@ const pool = new Pool({
   database: "defaultdb"
 });
 
-module.exports = { pool };
+function checkAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return res.redirect("/index");
+  }
+  next();
+}
+function checkNotAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/login");
+}
+
+module.exports = { pool, checkAuthenticated, checkNotAuthenticated };

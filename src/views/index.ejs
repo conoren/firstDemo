@@ -1,0 +1,38 @@
+<h1>Hello <%= name %></h1><hr>
+<div>
+    <h1>Events available</h1>
+    <p>event1</p>
+    <p>event2</p>
+    <p>event3</p>
+
+</div>
+<div>
+    <h1>Events that you have joined to</h1>
+    <p>event4</p>
+    <p>event5</p>
+</div>
+<form action="/eventJoin" method="POST">
+    <div>
+        <input type="number" id="id" name="id" placeholder="Your user ID" />
+    </div>
+    <div>
+     <input type="text" id="name" name="name" placeholder="Name of event" />
+    </div>
+      <input type="submit" value="Join event" />
+    </div>
+</form>
+<br>
+<form action="/eventLeave" method="POST">
+    <div>
+        <input type="number" id="id" name="id" placeholder="Your user ID" />
+    </div>
+    <div>
+     <input type="text" id="name" name="name" placeholder="Name of event" />
+    </div>
+      <input type="submit" value="Leave event" />
+    </div>
+</form>
+
+<hr>
+<a href="/eventManger">Event manager screen</a><br>
+<a href="/logout">Log out</a>
