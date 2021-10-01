@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "devStart": "nodemon server.js",
-    "swagger-autogen": "node ./swagger.js"
+    "start": "nodemon ./src/server.js",
+    "swagger-autogen": "node ./src/doc/swagger.js"
   },
   "author": "",
   "license": "ISC",
