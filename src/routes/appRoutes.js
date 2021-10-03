@@ -1,15 +1,22 @@
-const express = require("express");
-const { pool, checkAuthenticated, checkNotAuthenticated } = require("../config/db.config");
-const bcrypt = require("bcrypt");
+"use strict";
+/*const express = require("express");
+//const { pool, checkAuthenticated, checkNotAuthenticated } = require("../config/db.config");
+//require("../config/db.config").pool;
+//require("../config/db.config").checkAuthenticated;
+//require("../config/db.config").checkNotAuthenticated;
+const dbConfig = require("../config/db.config");
+const passportConfig = require("../config/passport-config");
+//require("../config/passport-config").bcrypt;
 const passport = require("passport");
 const flash = require("express-flash");
 const session = require("express-session");
-const initializePassport = require("../config/passport-config");
+
 const app = express();
 require("dotenv").config();
 
 const PORT = 3000;
-initializePassport(passport);
+
+passportConfig.initializePassport(passport);
 
 app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "ejs");
@@ -26,19 +33,19 @@ app.use(passport.session());
 app.use(flash());
 
 
-app.get("/", (req, res) => {
+app.get("/", (_req: any, res: { render: (arg0: string) => void; }) => {
   res.render("login.ejs");
 });
 
-app.get("/eventManger", checkNotAuthenticated, (req, res) => {
+app.get("/eventManger", dbConfig.checkNotAuthenticated, (_req: any, res: { render: (arg0: string) => void; }) => {
   res.render("eventManger.ejs");
 });
 
-app.post("/eventAdder", checkNotAuthenticated, (req, res) => {
+app.post("/eventAdder", dbConfig.checkNotAuthenticated, (req: { body: { name: any; description: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; description: any; }) => void; redirect: (arg0: string) => void; }) => {
   let { name, description } = req.body;
 
   let errors = [];
-  let attenders = [];
+  let attenders: never[] = [];
 
   console.log({
     name,
@@ -57,7 +64,7 @@ app.post("/eventAdder", checkNotAuthenticated, (req, res) => {
             VALUES ($1, $2, $3)
             RETURNING name, description`,
       [name, description, attenders],
-      (err, results) => {
+      (err: any, results: { rows: any; }) => {
         if (err) {
           throw err;
         }
@@ -68,7 +75,7 @@ app.post("/eventAdder", checkNotAuthenticated, (req, res) => {
     );
   }
 });
-app.delete("/eventDeleter", checkNotAuthenticated, (req, res) => {
+app.delete("/eventDeleter", dbConfig.checkNotAuthenticated, (req: { body: { name: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; }) => void; redirect: (arg0: string) => void; }) => {
   let { name } = req.body;
 
   let errors = [];
@@ -84,7 +91,7 @@ app.delete("/eventDeleter", checkNotAuthenticated, (req, res) => {
   if (errors.length > 0) {
     res.render("eventManager", { errors, name });
   } else {
-    pool.query(`DELETE FROM events WHERE name=$1`, [name], (err, results) => {
+    pool.query(`DELETE FROM events WHERE name=$1`, [name], (err: any, results: { rows: any; }) => {
       if (err) {
         throw err;
       }
@@ -94,7 +101,7 @@ app.delete("/eventDeleter", checkNotAuthenticated, (req, res) => {
     });
   }
 });
-app.post("/eventJoin", checkNotAuthenticated, (req, res) => {
+app.post("/eventJoin", dbConfig.checkNotAuthenticated, (req: { body: { name: any; id: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; }) => void; redirect: (arg0: string) => void; }) => {
   let { name, id } = req.body;
 
   let errors = [];
@@ -114,7 +121,7 @@ app.post("/eventJoin", checkNotAuthenticated, (req, res) => {
     pool.query(
       `UPDATE events SET attenders=$1 WHERE name=$2`,
       [[id], name],
-      (err, results) => {
+      (err: any, results: { rows: any; }) => {
         if (err) {
           throw err;
         }
@@ -125,7 +132,7 @@ app.post("/eventJoin", checkNotAuthenticated, (req, res) => {
     );
   }
 });
-app.post("/eventLeave", checkNotAuthenticated, (req, res) => {
+app.post("/eventLeave", dbConfig.checkNotAuthenticated, (req: { body: { name: any; id: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; }) => void; redirect: (arg0: string) => void; }) => {
   let { name, id } = req.body;
 
   let errors = [];
@@ -145,7 +152,7 @@ app.post("/eventLeave", checkNotAuthenticated, (req, res) => {
     pool.query(
       `UPDATE events SET attenders=$1 WHERE name=$2`,
       [[], name],
-      (err, results) => {
+      (err: any, results: { rows: any; }) => {
         if (err) {
           throw err;
         }
@@ -157,10 +164,10 @@ app.post("/eventLeave", checkNotAuthenticated, (req, res) => {
   }
 });
 
-app.get("/register", checkAuthenticated, (req, res) => {
+app.get("/register", dbConfig.checkAuthenticated, (_req: any, res: { render: (arg0: string) => void; }) => {
   res.render("register.ejs");
 });
-app.post("/register", async (req, res) => {
+app.post("/register", async (req: { body: { name: any; email: any; password: any; password2: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors?: { message: string; }[]; name?: any; email?: any; password?: any; password2?: any; message?: string; }) => void; redirect: (arg0: string) => void; }) => {
   let { name, email, password, password2 } = req.body;
 
   let errors = [];
@@ -187,14 +194,14 @@ app.post("/register", async (req, res) => {
   if (errors.length > 0) {
     res.render("register", { errors, name, email, password, password2 });
   } else {
-    hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     console.log(hashedPassword);
     // Validation passed
     pool.query(
       `SELECT * FROM users
           WHERE email = $1`,
       [email],
-      (err, results) => {
+      (err: any, results: { rows: string | any[]; }) => {
         if (err) {
           console.log(err);
         }
@@ -210,7 +217,7 @@ app.post("/register", async (req, res) => {
                   VALUES ($1, $2, $3)
                   RETURNING id, password`,
             [name, email, hashedPassword],
-            (err, results) => {
+            (err: any, results: { rows: any; }) => {
               if (err) {
                 throw err;
               }
@@ -225,7 +232,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.get("/login", checkAuthenticated, (req, res) => {
+app.get("/login", dbConfig.checkAuthenticated, (req: any, res: { render: (arg0: string) => void; }) => {
   res.render("login.ejs");
 });
 app.post(
@@ -237,11 +244,11 @@ app.post(
   })
 );
 
-app.get("/index", checkNotAuthenticated, (req, res) => {
+app.get("/index", dbConfig.checkNotAuthenticated, (req: { isAuthenticated: () => any; user: { name: any; }; pool: any; }, res: { render: (arg0: string, arg1: { name: any; events: any; }) => void; }) => {
   console.log(req.isAuthenticated());
 
-  const getAllEvents = (request, response) => {
-    pool.query("SELECT * FROM events ", (error, results) => {
+  const getAllEvents = (request: any, response: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: any): void; new(): any; }; }; }) => {
+    pool.query("SELECT * FROM events ", (error: any, results: { rows: any; }) => {
       if (error) {
         throw error;
       }
@@ -252,7 +259,7 @@ app.get("/index", checkNotAuthenticated, (req, res) => {
   res.render("index.ejs", { name: req.user.name, events: req.pool });
 });
 
-app.get("/logout", (req, res) => {
+app.get("/logout", (req: { logout: () => void; }, res: { render: (arg0: string, arg1: { message: string; }) => void; }) => {
   req.logout();
   res.render("login.ejs", { message: "You have logged out successfully" });
 });
@@ -263,4 +270,5 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-module.exports = app;
+module.exports = app, express;
+*/ 

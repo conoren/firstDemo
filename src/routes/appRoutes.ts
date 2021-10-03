@@ -1,17 +1,16 @@
-const express = require("express");
-const dbConfig = require("./config/db.config");
-const passportConfig = require("./config/passport-config");
+/*const express = require("express");
+//const { pool, checkAuthenticated, checkNotAuthenticated } = require("../config/db.config");
+//require("../config/db.config").pool;
+//require("../config/db.config").checkAuthenticated;
+//require("../config/db.config").checkNotAuthenticated;
+const dbConfig = require("../config/db.config");
+const passportConfig = require("../config/passport-config");
+//require("../config/passport-config").bcrypt;
 const passport = require("passport");
 const flash = require("express-flash");
 const session = require("express-session");
-const swaggerUi = require('swagger-ui-express');
-const swaggerFile = require('./doc/swagger-output.json');
-
-const eventRouter = require('./routes/event')
 
 const app = express();
-//const routes = require('./routes/eventRoutes')(app);
-
 require("dotenv").config();
 
 const PORT = 3000;
@@ -20,8 +19,6 @@ passportConfig.initializePassport(passport);
 
 app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "ejs");
-
-app.use(eventRouter);
 
 app.use(
   session({
@@ -34,17 +31,16 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
-app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 app.get("/", (_req: any, res: { render: (arg0: string) => void; }) => {
   res.render("login.ejs");
 });
 
-/*app.get("/eventManger", dbConfig.checkNotAuthenticated, (_req: any, res: { render: (arg0: string) => void; }) => {
+app.get("/eventManger", dbConfig.checkNotAuthenticated, (_req: any, res: { render: (arg0: string) => void; }) => {
   res.render("eventManger.ejs");
-});*/
+});
 
-/*app.post("/eventAdder", dbConfig.checkNotAuthenticated, (req: { body: { name: any; description: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; description: any; }) => void; redirect: (arg0: string) => void; }) => {
+app.post("/eventAdder", dbConfig.checkNotAuthenticated, (req: { body: { name: any; description: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; description: any; }) => void; redirect: (arg0: string) => void; }) => {
   let { name, description } = req.body;
 
   let errors = [];
@@ -62,7 +58,7 @@ app.get("/", (_req: any, res: { render: (arg0: string) => void; }) => {
   if (errors.length > 0) {
     res.render("eventManager", { errors, name, description });
   } else {
-    dbConfig.pool.query(
+    pool.query(
       `INSERT INTO events (name, description, attenders)
             VALUES ($1, $2, $3)
             RETURNING name, description`,
@@ -94,7 +90,7 @@ app.delete("/eventDeleter", dbConfig.checkNotAuthenticated, (req: { body: { name
   if (errors.length > 0) {
     res.render("eventManager", { errors, name });
   } else {
-    dbConfig.pool.query(`DELETE FROM events WHERE name=$1`, [name], (err: any, results: { rows: any; }) => {
+    pool.query(`DELETE FROM events WHERE name=$1`, [name], (err: any, results: { rows: any; }) => {
       if (err) {
         throw err;
       }
@@ -121,7 +117,7 @@ app.post("/eventJoin", dbConfig.checkNotAuthenticated, (req: { body: { name: any
   if (errors.length > 0) {
     res.render("index", { errors, name });
   } else {
-    dbConfig.pool.query(
+    pool.query(
       `UPDATE events SET attenders=$1 WHERE name=$2`,
       [[id], name],
       (err: any, results: { rows: any; }) => {
@@ -152,7 +148,7 @@ app.post("/eventLeave", dbConfig.checkNotAuthenticated, (req: { body: { name: an
   if (errors.length > 0) {
     res.render("index", { errors, name });
   } else {
-    dbConfig.pool.query(
+    pool.query(
       `UPDATE events SET attenders=$1 WHERE name=$2`,
       [[], name],
       (err: any, results: { rows: any; }) => {
@@ -166,7 +162,7 @@ app.post("/eventLeave", dbConfig.checkNotAuthenticated, (req: { body: { name: an
     );
   }
 });
-*/
+
 app.get("/register", dbConfig.checkAuthenticated, (_req: any, res: { render: (arg0: string) => void; }) => {
   res.render("register.ejs");
 });
@@ -200,7 +196,7 @@ app.post("/register", async (req: { body: { name: any; email: any; password: any
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log(hashedPassword);
     // Validation passed
-    dbConfig.pool.query(
+    pool.query(
       `SELECT * FROM users
           WHERE email = $1`,
       [email],
@@ -215,7 +211,7 @@ app.post("/register", async (req: { body: { name: any; email: any; password: any
             message: "Email already registered",
           });
         } else {
-            dbConfig.pool.query(
+          pool.query(
             `INSERT INTO users (name, email, password)
                   VALUES ($1, $2, $3)
                   RETURNING id, password`,
@@ -251,7 +247,7 @@ app.get("/index", dbConfig.checkNotAuthenticated, (req: { isAuthenticated: () =>
   console.log(req.isAuthenticated());
 
   const getAllEvents = (request: any, response: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: any): void; new(): any; }; }; }) => {
-    dbConfig.pool.query("SELECT * FROM events ", (error: any, results: { rows: any; }) => {
+    pool.query("SELECT * FROM events ", (error: any, results: { rows: any; }) => {
       if (error) {
         throw error;
       }
@@ -272,3 +268,6 @@ app.get("/logout", (req: { logout: () => void; }, res: { render: (arg0: string, 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = app, express;
+*/

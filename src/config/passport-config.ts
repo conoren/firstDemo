@@ -1,12 +1,12 @@
 "use strict";
 var LocalStrategy = require('passport-local').Strategy;
-var loginPool = require("./db.config.js").pool;
+const loginPool = require("./db.config.js").pool;
 var bcrypt = require('bcrypt');
-function initialize(passport) {
+function initialize(passport: { use: (arg0: any) => void; serializeUser: (arg0: (user: any, done: any) => any) => void; deserializeUser: (arg0: (id: any, done: any) => void) => void; }) {
     console.log("Initialized");
-    var authenticateUser = function (email, password, done) {
+    var authenticateUser = function (email: any, password: any, done: (arg0: null, arg1: boolean, arg2: { message: string; } | undefined) => any) {
         console.log(email, password);
-        loginPool.query("SELECT * FROM users WHERE email = $1", [email], function (err, results) {
+        loginPool.query("SELECT * FROM users WHERE email = $1", [email], function (err: any, results: { rows: string | any[]; }) {
             if (err) {
                 throw err;
             }
@@ -15,7 +15,7 @@ function initialize(passport) {
                 var user_1 = results.rows[0];
                 console.log("ezt találtuk: " + results.rows[0].password);
                 console.log("ez a beírt jelszó: " + user_1.password);
-                bcrypt.compare(password, user_1.password, function (err, isMatch) {
+                bcrypt.compare(password, user_1.password, function (err: any, isMatch: any) {
                     if (err) {
                         console.log(err);
                     }
@@ -39,7 +39,7 @@ function initialize(passport) {
     passport.use(new LocalStrategy({ usernameField: "email", passwordField: "password" }, authenticateUser));
     passport.serializeUser(function (user, done) { return done(null, user.id); });
     passport.deserializeUser(function (id, done) {
-        loginPool.query("SELECT * FROM users WHERE id = $1", [id], function (err, results) {
+        loginPool.query("SELECT * FROM users WHERE id = $1", [id], function (err: any, results: { rows: any[]; }) {
             if (err) {
                 return done(err);
             }
@@ -48,4 +48,4 @@ function initialize(passport) {
         });
     });
 }
-module.exports = { initializePassport: initialize, bcrypt: bcrypt };
+module.exports = {initializePassport:initialize, bcrypt:bcrypt};

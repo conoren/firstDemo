@@ -1,0 +1,8 @@
+rossz usert a postgresből kivettem
+normálisabb routok
+server.js-t szétbontani
+mappastruktúrákat kialakítani
+felesleges npm modulokat törölni
+összekötőtábla postgresben (usersxevents)
+typescriptre átírni
+routokat szétszedni külön fileokba - még nincs meg
