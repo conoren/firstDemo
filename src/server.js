@@ -64,132 +64,105 @@ app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 app.get("/", function (_req, res) {
     res.render("login.ejs");
 });
-/*app.get("/eventManger", dbConfig.checkNotAuthenticated, (_req: any, res: { render: (arg0: string) => void; }) => {
-  res.render("eventManger.ejs");
-});*/
-/*app.post("/eventAdder", dbConfig.checkNotAuthenticated, (req: { body: { name: any; description: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; description: any; }) => void; redirect: (arg0: string) => void; }) => {
-  let { name, description } = req.body;
-
-  let errors = [];
-  let attenders: never[] = [];
-
-  console.log({
-    name,
-    description,
-  });
-
-  if (!name || !description) {
-    errors.push({ message: "Please enter all fields" });
-  }
-
-  if (errors.length > 0) {
-    res.render("eventManager", { errors, name, description });
-  } else {
-    dbConfig.pool.query(
-      `INSERT INTO events (name, description, attenders)
-            VALUES ($1, $2, $3)
-            RETURNING name, description`,
-      [name, description, attenders],
-      (err: any, results: { rows: any; }) => {
-        if (err) {
-          throw err;
-        }
-        console.log(results.rows);
-        req.flash("success_msg", "Event added.");
-        res.redirect("/index");
-      }
-    );
-  }
+app.get("/eventManger", dbConfig.checkNotAuthenticated, function (_req, res) {
+    res.render("eventManger.ejs");
 });
-app.delete("/eventDeleter", dbConfig.checkNotAuthenticated, (req: { body: { name: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; }) => void; redirect: (arg0: string) => void; }) => {
-  let { name } = req.body;
-
-  let errors = [];
-
-  console.log({
-    name,
-  });
-
-  if (!name) {
-    errors.push({ message: "Please enter the event name" });
-  }
-
-  if (errors.length > 0) {
-    res.render("eventManager", { errors, name });
-  } else {
-    dbConfig.pool.query(`DELETE FROM events WHERE name=$1`, [name], (err: any, results: { rows: any; }) => {
-      if (err) {
-        throw err;
-      }
-      console.log(results.rows);
-      req.flash("success_msg", "Event deleted.");
-      res.redirect("/index");
+app.post("/eventAdder", dbConfig.checkNotAuthenticated, function (req, res) {
+    var _a = req.body, name = _a.name, description = _a.description;
+    var errors = [];
+    var attenders = [];
+    console.log({
+        name: name,
+        description: description,
     });
-  }
+    if (!name || !description) {
+        errors.push({ message: "Please enter all fields" });
+    }
+    if (errors.length > 0) {
+        res.render("eventManager", { errors: errors, name: name, description: description });
+    }
+    else {
+        dbConfig.pool.query("INSERT INTO events (name, description, attenders)\n            VALUES ($1, $2, $3)\n            RETURNING name, description", [name, description, attenders], function (err, results) {
+            if (err) {
+                throw err;
+            }
+            console.log(results.rows);
+            req.flash("success_msg", "Event added.");
+            res.redirect("/index");
+        });
+    }
 });
-app.post("/eventJoin", dbConfig.checkNotAuthenticated, (req: { body: { name: any; id: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; }) => void; redirect: (arg0: string) => void; }) => {
-  let { name, id } = req.body;
-
-  let errors = [];
-
-  console.log({
-    name,
-    id,
-  });
-
-  if (!name) {
-    errors.push({ message: "Please enter the event name" });
-  }
-
-  if (errors.length > 0) {
-    res.render("index", { errors, name });
-  } else {
-    dbConfig.pool.query(
-      `UPDATE events SET attenders=$1 WHERE name=$2`,
-      [[id], name],
-      (err: any, results: { rows: any; }) => {
-        if (err) {
-          throw err;
-        }
-        console.log(results.rows);
-        req.flash("success_msg", "Joined.");
-        res.redirect("/index");
-      }
-    );
-  }
+app.delete("/eventDeleter", dbConfig.checkNotAuthenticated, function (req, res) {
+    var name = req.body.name;
+    var errors = [];
+    console.log({
+        name: name,
+    });
+    if (!name) {
+        errors.push({ message: "Please enter the event name" });
+    }
+    if (errors.length > 0) {
+        res.render("eventManager", { errors: errors, name: name });
+    }
+    else {
+        dbConfig.pool.query("DELETE FROM events WHERE name=$1", [name], function (err, results) {
+            if (err) {
+                throw err;
+            }
+            console.log(results.rows);
+            req.flash("success_msg", "Event deleted.");
+            res.redirect("/index");
+        });
+    }
 });
-app.post("/eventLeave", dbConfig.checkNotAuthenticated, (req: { body: { name: any; id: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; }) => void; redirect: (arg0: string) => void; }) => {
-  let { name, id } = req.body;
-
-  let errors = [];
-
-  console.log({
-    name,
-    id,
-  });
-
-  if (!name) {
-    errors.push({ message: "Please enter the event name" });
-  }
-
-  if (errors.length > 0) {
-    res.render("index", { errors, name });
-  } else {
-    dbConfig.pool.query(
-      `UPDATE events SET attenders=$1 WHERE name=$2`,
-      [[], name],
-      (err: any, results: { rows: any; }) => {
-        if (err) {
-          throw err;
-        }
-        console.log(results.rows);
-        req.flash("success_msg", "Left.");
-        res.redirect("/index");
-      }
-    );
-  }
+app.post("/eventJoin", dbConfig.checkNotAuthenticated, function (req, res) {
+    var _a = req.body, name = _a.name, id = _a.id;
+    var errors = [];
+    console.log({
+        name: name,
+        id: id,
+    });
+    if (!name) {
+        errors.push({ message: "Please enter the event name" });
+    }
+    if (errors.length > 0) {
+        res.render("index", { errors: errors, name: name });
+    }
+    else {
+        dbConfig.pool.query("UPDATE events SET attenders=$1 WHERE name=$2", [[id], name], function (err, results) {
+            if (err) {
+                throw err;
+            }
+            console.log(results.rows);
+            req.flash("success_msg", "Joined.");
+            res.redirect("/index");
+        });
+    }
 });
-*/
+app.post("/eventLeave", dbConfig.checkNotAuthenticated, function (req, res) {
+    var _a = req.body, name = _a.name, id = _a.id;
+    var errors = [];
+    console.log({
+        name: name,
+        id: id,
+    });
+    if (!name) {
+        errors.push({ message: "Please enter the event name" });
+    }
+    if (errors.length > 0) {
+        res.render("index", { errors: errors, name: name });
+    }
+    else {
+        dbConfig.pool.query("UPDATE events SET attenders=$1 WHERE name=$2", [[], name], function (err, results) {
+            if (err) {
+                throw err;
+            }
+            console.log(results.rows);
+            req.flash("success_msg", "Left.");
+            res.redirect("/index");
+        });
+    }
+});
 app.get("/register", dbConfig.checkAuthenticated, function (_req, res) {
     res.render("register.ejs");
 });
@@ -218,7 +191,7 @@ app.post("/register", function (req, res) { return __awaiter(void 0, void 0, voi
                 if (!(errors.length > 0)) return [3 /*break*/, 1];
                 res.render("register", { errors: errors, name: name, email: email, password: password, password2: password2 });
                 return [3 /*break*/, 3];
-            case 1: return [4 /*yield*/, bcrypt.hash(password, 10)];
+            case 1: return [4 /*yield*/, passportConfig.bcrypt.hash(password, 10)];
             case 2:
                 hashedPassword_1 = _b.sent();
                 console.log(hashedPassword_1);

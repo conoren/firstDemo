@@ -40,11 +40,11 @@ app.get("/", (_req: any, res: { render: (arg0: string) => void; }) => {
   res.render("login.ejs");
 });
 
-/*app.get("/eventManger", dbConfig.checkNotAuthenticated, (_req: any, res: { render: (arg0: string) => void; }) => {
+app.get("/eventManger", dbConfig.checkNotAuthenticated, (_req: any, res: { render: (arg0: string) => void; }) => {
   res.render("eventManger.ejs");
-});*/
+});
 
-/*app.post("/eventAdder", dbConfig.checkNotAuthenticated, (req: { body: { name: any; description: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; description: any; }) => void; redirect: (arg0: string) => void; }) => {
+app.post("/eventAdder", dbConfig.checkNotAuthenticated, (req: { body: { name: any; description: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; description: any; }) => void; redirect: (arg0: string) => void; }) => {
   let { name, description } = req.body;
 
   let errors = [];
@@ -166,7 +166,7 @@ app.post("/eventLeave", dbConfig.checkNotAuthenticated, (req: { body: { name: an
     );
   }
 });
-*/
+
 app.get("/register", dbConfig.checkAuthenticated, (_req: any, res: { render: (arg0: string) => void; }) => {
   res.render("register.ejs");
 });
@@ -197,7 +197,7 @@ app.post("/register", async (req: { body: { name: any; email: any; password: any
   if (errors.length > 0) {
     res.render("register", { errors, name, email, password, password2 });
   } else {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await passportConfig.bcrypt.hash(password, 10);
     console.log(hashedPassword);
     // Validation passed
     dbConfig.pool.query(
