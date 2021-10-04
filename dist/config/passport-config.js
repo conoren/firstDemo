@@ -1,12 +1,15 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.bcrypt = exports.initialize = void 0;
 var LocalStrategy = require('passport-local').Strategy;
-var loginPool = require("./db.config.js").pool;
 var bcrypt = require('bcrypt');
+exports.bcrypt = bcrypt;
+var db_config_1 = require("./db.config");
 function initialize(passport) {
     console.log("Initialized");
     var authenticateUser = function (email, password, done) {
         console.log(email, password);
-        loginPool.query("SELECT * FROM users WHERE email = $1", [email], function (err, results) {
+        db_config_1.pool.query("SELECT * FROM users WHERE email = $1", [email], function (err, results) {
             if (err) {
                 throw err;
             }
@@ -39,7 +42,7 @@ function initialize(passport) {
     passport.use(new LocalStrategy({ usernameField: "email", passwordField: "password" }, authenticateUser));
     passport.serializeUser(function (user, done) { return done(null, user.id); });
     passport.deserializeUser(function (id, done) {
-        loginPool.query("SELECT * FROM users WHERE id = $1", [id], function (err, results) {
+        db_config_1.pool.query("SELECT * FROM users WHERE id = $1", [id], function (err, results) {
             if (err) {
                 return done(err);
             }
@@ -48,4 +51,5 @@ function initialize(passport) {
         });
     });
 }
-module.exports = { initializePassport: initialize, bcrypt: bcrypt };
+exports.initialize = initialize;
+//# sourceMappingURL=passport-config.js.map

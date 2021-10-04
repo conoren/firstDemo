@@ -35,7 +35,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var express = require("express");
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+//import express from 'express'
+var express = require('express');
 var dbConfig = require("./config/db.config");
 var passportConfig = require("./config/passport-config");
 var passport = require("passport");
@@ -43,125 +48,26 @@ var flash = require("express-flash");
 var session = require("express-session");
 var swaggerUi = require('swagger-ui-express');
 var swaggerFile = require('./doc/swagger-output.json');
-var eventRouter = require('./routes/event');
+//const eventRouter = require('./routes/event')
+var event_1 = __importDefault(require("./routes/event"));
 var app = express();
-//const routes = require('./routes/eventRoutes')(app);
 require("dotenv").config();
 var PORT = 3000;
-passportConfig.initializePassport(passport);
+passportConfig.initialize(passport);
 app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "ejs");
-app.use(eventRouter);
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
 }));
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash());
 app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+app.use(event_1.default);
 app.get("/", function (_req, res) {
     res.render("login.ejs");
-});
-app.get("/eventManger", dbConfig.checkNotAuthenticated, function (_req, res) {
-    res.render("eventManger.ejs");
-});
-app.post("/eventAdder", dbConfig.checkNotAuthenticated, function (req, res) {
-    var _a = req.body, name = _a.name, description = _a.description;
-    var errors = [];
-    var attenders = [];
-    console.log({
-        name: name,
-        description: description,
-    });
-    if (!name || !description) {
-        errors.push({ message: "Please enter all fields" });
-    }
-    if (errors.length > 0) {
-        res.render("eventManager", { errors: errors, name: name, description: description });
-    }
-    else {
-        dbConfig.pool.query("INSERT INTO events (name, description, attenders)\n            VALUES ($1, $2, $3)\n            RETURNING name, description", [name, description, attenders], function (err, results) {
-            if (err) {
-                throw err;
-            }
-            console.log(results.rows);
-            req.flash("success_msg", "Event added.");
-            res.redirect("/index");
-        });
-    }
-});
-app.delete("/eventDeleter", dbConfig.checkNotAuthenticated, function (req, res) {
-    var name = req.body.name;
-    var errors = [];
-    console.log({
-        name: name,
-    });
-    if (!name) {
-        errors.push({ message: "Please enter the event name" });
-    }
-    if (errors.length > 0) {
-        res.render("eventManager", { errors: errors, name: name });
-    }
-    else {
-        dbConfig.pool.query("DELETE FROM events WHERE name=$1", [name], function (err, results) {
-            if (err) {
-                throw err;
-            }
-            console.log(results.rows);
-            req.flash("success_msg", "Event deleted.");
-            res.redirect("/index");
-        });
-    }
-});
-app.post("/eventJoin", dbConfig.checkNotAuthenticated, function (req, res) {
-    var _a = req.body, name = _a.name, id = _a.id;
-    var errors = [];
-    console.log({
-        name: name,
-        id: id,
-    });
-    if (!name) {
-        errors.push({ message: "Please enter the event name" });
-    }
-    if (errors.length > 0) {
-        res.render("index", { errors: errors, name: name });
-    }
-    else {
-        dbConfig.pool.query("UPDATE events SET attenders=$1 WHERE name=$2", [[id], name], function (err, results) {
-            if (err) {
-                throw err;
-            }
-            console.log(results.rows);
-            req.flash("success_msg", "Joined.");
-            res.redirect("/index");
-        });
-    }
-});
-app.post("/eventLeave", dbConfig.checkNotAuthenticated, function (req, res) {
-    var _a = req.body, name = _a.name, id = _a.id;
-    var errors = [];
-    console.log({
-        name: name,
-        id: id,
-    });
-    if (!name) {
-        errors.push({ message: "Please enter the event name" });
-    }
-    if (errors.length > 0) {
-        res.render("index", { errors: errors, name: name });
-    }
-    else {
-        dbConfig.pool.query("UPDATE events SET attenders=$1 WHERE name=$2", [[], name], function (err, results) {
-            if (err) {
-                throw err;
-            }
-            console.log(results.rows);
-            req.flash("success_msg", "Left.");
-            res.redirect("/index");
-        });
-    }
 });
 app.get("/register", dbConfig.checkAuthenticated, function (_req, res) {
     res.render("register.ejs");
@@ -180,16 +86,16 @@ app.post("/register", function (req, res) { return __awaiter(void 0, void 0, voi
                     password2: password2,
                 });
                 if (!name || !email || !password || !password2) {
-                    errors.push({ message: "Please enter all fields" });
+                    errors.push("Please enter all fields");
                 }
                 if (password.length < 6) {
-                    errors.push({ message: "Password must be a least 6 characters long" });
+                    errors.push("Password must be a least 6 characters long");
                 }
                 if (password !== password2) {
-                    errors.push({ message: "Passwords do not match" });
+                    errors.push("Passwords do not match");
                 }
                 if (!(errors.length > 0)) return [3 /*break*/, 1];
-                res.render("register", { errors: errors, name: name, email: email, password: password, password2: password2 });
+                res.render("register", { name: name, email: email, password: password, password2: password2 });
                 return [3 /*break*/, 3];
             case 1: return [4 /*yield*/, passportConfig.bcrypt.hash(password, 10)];
             case 2:
@@ -242,10 +148,11 @@ app.get("/index", dbConfig.checkNotAuthenticated, function (req, res) {
     };
     res.render("index.ejs", { name: req.user.name, events: req.pool });
 });
-app.get("/logout", function (req, res) {
+app.get("/logout", function (req, res, message) {
     req.logout();
     res.render("login.ejs", { message: "You have logged out successfully" });
 });
 app.listen(PORT, function () {
     console.log("Server running on port " + PORT);
 });
+//# sourceMappingURL=server.js.map

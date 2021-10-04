@@ -1,5 +1,4 @@
 require("dotenv").config();
-
 const { Pool } = require("pg");
 
 const pool = new Pool({
@@ -24,4 +23,6 @@ function checkNotAuthenticated(req: { isAuthenticated: () => any; }, res: { redi
   res.redirect("/login");
 }
 
-module.exports = { pool, checkAuthenticated, checkNotAuthenticated };
+export {
+  pool, checkAuthenticated, checkNotAuthenticated
+};

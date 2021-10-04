@@ -1,4 +1,6 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.checkNotAuthenticated = exports.checkAuthenticated = exports.pool = void 0;
 require("dotenv").config();
 var Pool = require("pg").Pool;
 var pool = new Pool({
@@ -9,16 +11,19 @@ var pool = new Pool({
     ssl: { rejectUnauthorized: false },
     database: "defaultdb"
 });
+exports.pool = pool;
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return res.redirect("/index");
     }
     next();
 }
+exports.checkAuthenticated = checkAuthenticated;
 function checkNotAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     }
     res.redirect("/login");
 }
-module.exports = { pool: pool, checkAuthenticated: checkAuthenticated, checkNotAuthenticated: checkNotAuthenticated };
+exports.checkNotAuthenticated = checkNotAuthenticated;
+//# sourceMappingURL=db.config.js.map
