@@ -21,6 +21,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var eventDbConfig = __importStar(require("../config/db.config"));
 var eventExpr = require('express');
+//import express from 'express';
 var router = new eventExpr.Router();
 router.get("/eventManager", eventDbConfig.checkNotAuthenticated, function (_req, res) {
     console.log("=== EVENT MANAGER ====");

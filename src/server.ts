@@ -1,7 +1,12 @@
 import eventRouter from './routes/eventRoutes'
 import loginRouter from './routes/loginRoutes'
+import userRouter from './routes/userRoutes'
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import express from 'express';
+import { jwt } from './middlewares/auth'
 
-const express = require('express')
+
 const passportConfig = require("./config/passport-config");
 const passport = require("passport");
 const flash = require("express-flash");
@@ -15,9 +20,15 @@ require("dotenv").config();
 
 const PORT = 3000;
 
+app.use(jwt())
+
+app.use(cors());
+
 passportConfig.initialize(passport);
 
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "ejs");
 
 app.use(
@@ -36,6 +47,7 @@ app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 app.use(eventRouter);
 app.use(loginRouter);
+app.use(userRouter);
 
 
 app.listen(PORT, () => {

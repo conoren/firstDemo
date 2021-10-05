@@ -1,5 +1,6 @@
 import * as eventDbConfig  from "../config/db.config";
 const eventExpr = require('express')
+//import express from 'express';
 const router = new eventExpr.Router()
 
 router.get("/eventManager", eventDbConfig.checkNotAuthenticated, (_req: any, res: { render: (arg0: string) => void; }) => {
