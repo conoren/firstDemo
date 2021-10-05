@@ -53,4 +53,3 @@ function initialize(passport: { use: (arg0: any) => void; serializeUser: (arg0: 
 export{
     initialize, bcrypt
 }
-//module.exports = {initializePassport:initialize, bcrypt:bcrypt};
