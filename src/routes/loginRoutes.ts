@@ -1,15 +1,22 @@
-app.get("/", (req, res) => {
+import * as DbConfig  from "../config/db.config";
+import * as passportConfig from "../config/passport-config"
+const eventExpr = require('express')
+const bcrypt = require('bcrypt')
+const router = new eventExpr.Router()
+const passport = require("passport");
+
+router.get("/", (req, res) => {
   res.render("login.ejs");
 });
 
-app.get("/register", checkAuthenticated, (req, res) => {
+router.get("/register", DbConfig.checkAuthenticated, (req, res) => {
   res.render("register.ejs");
 });
 
-app.post("/register", async (req, res) => {
+router.post("/register", async (req, res) => {
   let { name, email, password, password2 } = req.body;
 
-  let errors = [];
+  let errors: { message: string; }[] = [];
 
   console.log({
     name,
@@ -33,10 +40,10 @@ app.post("/register", async (req, res) => {
   if (errors.length > 0) {
     res.render("register", { errors, name, email, password, password2 });
   } else {
-    hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     console.log(hashedPassword);
     // Validation passed
-    pool.query(
+    DbConfig.pool.query(
       `SELECT * FROM users
             WHERE email = $1`,
       [email],
@@ -51,7 +58,7 @@ app.post("/register", async (req, res) => {
             message: "Email already registered",
           });
         } else {
-          pool.query(
+          DbConfig.pool.query(
             `INSERT INTO users (name, email, password)
                     VALUES ($1, $2, $3)
                     RETURNING id, password`,
@@ -71,11 +78,11 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.get("/login", checkAuthenticated, (req, res) => {
+router.get("/login", DbConfig.checkAuthenticated, (req, res) => {
   res.render("login.ejs");
 });
 
-app.post(
+router.post(
   "/login",
   passport.authenticate("local", {
     successRedirect: "/index",
@@ -84,11 +91,11 @@ app.post(
   })
 );
 
-app.get("/index", checkNotAuthenticated, (req, res) => {
+router.get("/index", DbConfig.checkNotAuthenticated, (req, res) => {
   console.log(req.isAuthenticated());
 
   const getAllEvents = (request, response) => {
-    pool.query("SELECT * FROM events ", (error, results) => {
+    DbConfig.pool.query("SELECT * FROM events ", (error, results) => {
       if (error) {
         throw error;
       }
@@ -99,7 +106,9 @@ app.get("/index", checkNotAuthenticated, (req, res) => {
   res.render("index.ejs", { name: req.user.name, events: req.pool });
 });
 
-app.get("/logout", (req, res) => {
+router.get("/logout", (req, res) => {
   req.logout();
   res.render("login.ejs", { message: "You have logged out successfully" });
 });
+
+export default router;
