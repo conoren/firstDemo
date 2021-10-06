@@ -1,7 +1,8 @@
 "use strict";
-var LocalStrategy = require('passport-local').Strategy;
-var bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt'
 import { pool } from "./db.config";
+var LocalStrategy = require('passport-local').Strategy;
+
 
 function initialize(passport: { use: (arg0: any) => void; serializeUser: (arg0: (user: any, done: any) => any) => void; deserializeUser: (arg0: (id: any, done: any) => void) => void; }) {
     console.log("Initialized");
@@ -53,4 +54,3 @@ function initialize(passport: { use: (arg0: any) => void; serializeUser: (arg0: 
 export{
     initialize, bcrypt
 }
-//module.exports = {initializePassport:initialize, bcrypt:bcrypt};

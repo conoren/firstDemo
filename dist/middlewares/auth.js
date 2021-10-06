@@ -1,13 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.errorHandler = exports.jwt = void 0;
-var expressJwt = require('express-jwt');
-//const config = require('config.json');
-//require("dotenv").config();
-//module.exports = jwt;
+var express_jwt_1 = __importDefault(require("express-jwt"));
 function jwt() {
     var secret = process.env.SESSION_SECRET;
-    return expressJwt({ secret: secret, algorithms: ['HS256'] }).unless({
+    return express_jwt_1.default({ secret: secret, algorithms: ['HS256'] }).unless({
         path: [
             // public routes that don't require authentication
             '/authenticate',

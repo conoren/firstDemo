@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import * as userService from '../services/userService';
+
 const router = express.Router();
-const userService = require('../services/userService');
 
 // routes
 router.post('/authenticate', authenticate);

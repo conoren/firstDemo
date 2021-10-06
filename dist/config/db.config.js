@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkNotAuthenticated = exports.checkAuthenticated = exports.pool = void 0;
 require("dotenv").config();
-var Pool = require("pg").Pool;
-var pool = new Pool({
+//const { Pool } = require("pg");
+var pg_1 = require("pg");
+var pool = new pg_1.Pool({
     user: process.env.PGUSER,
     host: "db-toth-aron-do-user-7298387-0.b.db.ondigitalocean.com",
     port: 25060,

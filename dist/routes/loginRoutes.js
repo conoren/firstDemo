@@ -54,12 +54,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var DbConfig = __importStar(require("../config/db.config"));
+var bcrypt_1 = __importDefault(require("bcrypt"));
+var passport_1 = __importDefault(require("passport"));
 var eventExpr = require('express');
-var bcrypt = require('bcrypt');
 var router = new eventExpr.Router();
-var passport = require("passport");
 router.get("/", function (req, res) {
     res.render("login.ejs");
 });
@@ -91,7 +94,7 @@ router.post("/register", function (req, res) { return __awaiter(void 0, void 0, 
                 if (!(errors.length > 0)) return [3 /*break*/, 1];
                 res.render("register", { errors: errors, name: name, email: email, password: password, password2: password2 });
                 return [3 /*break*/, 3];
-            case 1: return [4 /*yield*/, bcrypt.hash(password, 10)];
+            case 1: return [4 /*yield*/, bcrypt_1.default.hash(password, 10)];
             case 2:
                 hashedPassword_1 = _b.sent();
                 console.log(hashedPassword_1);
@@ -125,7 +128,7 @@ router.post("/register", function (req, res) { return __awaiter(void 0, void 0, 
 router.get("/login", DbConfig.checkAuthenticated, function (req, res) {
     res.render("login.ejs");
 });
-router.post("/login", passport.authenticate("local", {
+router.post("/login", passport_1.default.authenticate("local", {
     successRedirect: "/index",
     failureRedirect: "/login",
     failureFlash: true,
