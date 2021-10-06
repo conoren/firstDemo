@@ -1,6 +1,7 @@
-require("dotenv").config();
-//const { Pool } = require("pg");
 import {Pool} from 'pg'
+import { User, Userxevents, Event } from '../interfaces/jwtInterfaces';
+require("dotenv").config();
+
 
 const pool = new Pool({
   user:process.env.PGUSER,
@@ -10,6 +11,17 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
   database: "defaultdb"
 });
+
+var users: User = pool.query(`SELECT * FROM users`,(err,results)=>{
+  users=results.rows
+})
+var events: Event = pool.query(`SELECT * FROM events`,(err,results)=>{
+  events=results.rows
+})
+var usersxevents: Userxevents = pool.query(`SELECT * FROM usersxevents`,(err,results)=>{
+  usersxevents=results.rows
+})
+
 
 function checkAuthenticated(req: { isAuthenticated: () => any; }, res: { redirect: (arg0: string) => any; }, next: () => void) {
   if (req.isAuthenticated()) {
@@ -25,5 +37,5 @@ function checkNotAuthenticated(req: { isAuthenticated: () => any; }, res: { redi
 }
 
 export {
-  pool, checkAuthenticated, checkNotAuthenticated
+  pool, checkAuthenticated, checkNotAuthenticated, users, events, usersxevents
 };

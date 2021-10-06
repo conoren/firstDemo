@@ -1,8 +1,21 @@
 export interface User {
+    find(arg0: (u: any) => boolean);
     id: number;
-    dateCreated: number;
-    username: string;
-    password: string;
+    name: string;
+    email: string;
+    password: string
+}
+
+export interface Event {
+    find(arg0: (u: any) => boolean);
+    name: string;
+    description: string;
+}
+
+export interface Userxevents {
+    find(arg0: (u: any) => boolean);
+    userId: number;
+    eventName: string;
 }
 
 export interface Session {

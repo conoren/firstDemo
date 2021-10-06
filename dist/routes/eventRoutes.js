@@ -20,11 +20,28 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var eventDbConfig = __importStar(require("../config/db.config"));
+var eventService = __importStar(require("../services/eventService"));
 var eventExpr = require('express');
 var router = new eventExpr.Router();
 router.get("/eventManager", eventDbConfig.checkNotAuthenticated, function (_req, res) {
     console.log("=== EVENT MANAGER ====");
     res.render("eventManager.ejs");
+});
+router.get('/getAllEvents', function (req, res) {
+    eventService.getAllEvents()
+        .then(function (events) { return res.json(events); });
+});
+router.get('/getEvent', function (req, res) {
+    eventService.getEvent(req.body)
+        .then(function (event) { return res.json(event); });
+});
+router.post('/addEvent', function (req, res) {
+    var _a = req.body, name = _a.name, description = _a.description;
+    eventDbConfig.pool.query("INSERT INTO events (name, description)\n            VALUES ($1, $2)\n            RETURNING name, description", [name, description]).then(res.send("event added")).catch(function (err) { res.status(500).send(); });
+});
+router.delete('/deleteEvent', function (req, res) {
+    var name = req.body.name;
+    eventDbConfig.pool.query("DELETE FROM events WHERE name=$1", [name]).then(res.send("event deleted")).catch(function (err) { res.status(500).send(); });
 });
 router.post("/eventAdder", eventDbConfig.checkNotAuthenticated, function (req, res) {
     var _a = req.body, name = _a.name, description = _a.description;
@@ -42,7 +59,7 @@ router.post("/eventAdder", eventDbConfig.checkNotAuthenticated, function (req, r
         res.render("eventManager", { errors: errors, name: name, description: description });
     }
     else {
-        eventDbConfig.pool.query("INSERT INTO events (name, description, attenders)\n                VALUES ($1, $2, $3)\n                RETURNING name, description", [name, description, attenders], function (err, results) {
+        eventDbConfig.pool.query("INSERT INTO events (name, description)\n                VALUES ($1, $2)\n                RETURNING name, description", [name, description], function (err, results) {
             if (err) {
                 throw err;
             }

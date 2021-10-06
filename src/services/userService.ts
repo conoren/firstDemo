@@ -1,13 +1,11 @@
+import { pool, users } from "../config/db.config";
+import { bcrypt } from "../config/passport-config";
+import { User } from "../interfaces/jwtInterfaces";
 const jwt = require('jsonwebtoken');
 
-// ezt majd átváltani postgre-re
-const users = [
-    { id: 1, email: 'conoren2@gmail.com', password: 'belavagyok', firstName: 'Test', lastName: 'User', name: 'Tóth Béla' },
-    { id: 2, email: 'cecil@gmail.com', password: 'cecilvagyok', firstName: 'Test', lastName: 'User', name: 'Tóth Cecil' }
-];
 
 export async function authenticate({ email, password }) {
-    const user = users.find(u => u.email === email && u.password === password);
+    const user = users.find(u => u.email === email && bcrypt.compare(password, u.password));
 
     if (!user) throw 'Email or password is incorrect';
 
@@ -21,7 +19,7 @@ export async function authenticate({ email, password }) {
 }
 
 export async function getAll() {
-    return users.map(u => omitPassword(u));
+    return users;
 }
 
 function omitPassword(user) {

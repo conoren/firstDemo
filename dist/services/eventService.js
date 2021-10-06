@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -46,46 +35,30 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAll = exports.authenticate = void 0;
+exports.getEvent = exports.getAllEvents = void 0;
 var db_config_1 = require("../config/db.config");
-var passport_config_1 = require("../config/passport-config");
-var jwt = require('jsonwebtoken');
-function authenticate(_a) {
-    var email = _a.email, password = _a.password;
-    return __awaiter(this, void 0, void 0, function () {
-        var user, token;
-        return __generator(this, function (_b) {
-            user = db_config_1.users.find(function (u) { return u.email === email && passport_config_1.bcrypt.compare(password, u.password); });
-            if (!user)
-                throw 'Email or password is incorrect';
-            token = jwt.sign({ sub: user.id }, process.env.SESSION_SECRET, { expiresIn: '1h' });
-            return [2 /*return*/, __assign(__assign({}, omitPassword(user)), { token: token })];
-        });
-    });
-}
-exports.authenticate = authenticate;
-function getAll() {
+function getAllEvents() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            return [2 /*return*/, db_config_1.users];
+            return [2 /*return*/, db_config_1.events];
         });
     });
 }
-exports.getAll = getAll;
-function omitPassword(user) {
-    var password = user.password, userWithoutPassword = __rest(user, ["password"]);
-    return userWithoutPassword;
+exports.getAllEvents = getAllEvents;
+function getEvent(body) {
+    return __awaiter(this, void 0, void 0, function () {
+        var event;
+        return __generator(this, function (_a) {
+            event = db_config_1.events.find(function (u) { return u.name === body.name; });
+            return [2 /*return*/, event];
+        });
+    });
 }
-//# sourceMappingURL=userService.js.map
+exports.getEvent = getEvent;
+//make new event
+//delete event
+//get my events
+//join an event
+//leave an event
+//# sourceMappingURL=eventService.js.map

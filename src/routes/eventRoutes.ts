@@ -1,4 +1,5 @@
 import * as eventDbConfig  from "../config/db.config";
+import * as eventService from '../services/eventService'
 const eventExpr = require('express')
 const router = new eventExpr.Router()
 
@@ -6,6 +7,31 @@ router.get("/eventManager", eventDbConfig.checkNotAuthenticated, (_req: any, res
     console.log("=== EVENT MANAGER ====")
     res.render("eventManager.ejs");
 });
+
+router.get('/getAllEvents', (req,res)=>{
+  eventService.getAllEvents()
+  .then(events => res.json(events));
+})
+
+router.get('/getEvent', (req,res)=>{
+  eventService.getEvent(req.body)
+  .then(event=>res.json(event));
+})
+
+router.post('/addEvent',(req,res)=>{
+  let { name, description } = req.body;
+  eventDbConfig.pool.query(
+    `INSERT INTO events (name, description)
+            VALUES ($1, $2)
+            RETURNING name, description`,
+    [name, description]).then(res.send("event added")).catch(err=>{res.status(500).send()})
+})
+
+router.delete('/deleteEvent',(req,res)=>{
+  let { name } = req.body;
+  eventDbConfig.pool.query(
+    `DELETE FROM events WHERE name=$1`, [name]).then(res.send("event deleted")).catch(err=>{res.status(500).send()})
+})
 
 router.post("/eventAdder", eventDbConfig.checkNotAuthenticated, (req: { body: { name: any; description: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; description: any; }) => void; redirect: (arg0: string) => void; }) => {
     let { name, description } = req.body;
@@ -26,10 +52,10 @@ router.post("/eventAdder", eventDbConfig.checkNotAuthenticated, (req: { body: { 
       res.render("eventManager", { errors, name, description });
     } else {
       eventDbConfig.pool.query(
-        `INSERT INTO events (name, description, attenders)
-                VALUES ($1, $2, $3)
+        `INSERT INTO events (name, description)
+                VALUES ($1, $2)
                 RETURNING name, description`,
-        [name, description, attenders],
+        [name, description],
         (err: any, results: { rows: any; }) => {
           if (err) {
             throw err;

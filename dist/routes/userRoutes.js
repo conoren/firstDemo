@@ -26,13 +26,18 @@ var express_1 = __importDefault(require("express"));
 var userService = __importStar(require("../services/userService"));
 var router = express_1.default.Router();
 // routes
-router.post('/authenticate', authenticate);
-router.get('/getusers', getAll);
-function authenticate(req, res, next) {
+//router.post('/authenticate', authenticate);
+router.post('/authenticate', function (req, res, next) {
     userService.authenticate(req.body)
         .then(function (user) { return res.json(user); })
         .catch(next);
-}
+});
+router.get('/getusers', getAll);
+/*function authenticate(req, res, next) {
+    userService.authenticate(req.body)
+        .then(user => res.json(user))
+        .catch(next);
+}*/
 function getAll(req, res, next) {
     userService.getAll()
         .then(function (users) { return res.json(users); })

@@ -13,8 +13,8 @@ var sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     }
 });
 var db = {};
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
-db.tutorials = require("./tutorial.model.js")(sequelize, Sequelize);
+//db.Sequelize = Sequelize;
+//db.sequelize = sequelize;
+//db.tutorials = require("./tutorial.model.js")(sequelize, Sequelize);
 module.exports = db;
 //# sourceMappingURL=crudFuncts.js.map
