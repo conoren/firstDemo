@@ -57,17 +57,14 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-//const config = require('config.json');
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getAll = exports.authenticate = void 0;
 var jwt = require('jsonwebtoken');
 // ezt majd átváltani postgre-re
 var users = [
     { id: 1, email: 'conoren2@gmail.com', password: 'belavagyok', firstName: 'Test', lastName: 'User', name: 'Tóth Béla' },
     { id: 2, email: 'cecil@gmail.com', password: 'cecilvagyok', firstName: 'Test', lastName: 'User', name: 'Tóth Cecil' }
 ];
-module.exports = {
-    authenticate: authenticate,
-    getAll: getAll
-};
 function authenticate(_a) {
     var email = _a.email, password = _a.password;
     return __awaiter(this, void 0, void 0, function () {
@@ -81,6 +78,7 @@ function authenticate(_a) {
         });
     });
 }
+exports.authenticate = authenticate;
 function getAll() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -88,7 +86,7 @@ function getAll() {
         });
     });
 }
-// helper functions
+exports.getAll = getAll;
 function omitPassword(user) {
     var password = user.password, userWithoutPassword = __rest(user, ["password"]);
     return userWithoutPassword;

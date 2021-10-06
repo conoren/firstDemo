@@ -1,9 +1,15 @@
 rossz usert a postgresből kivettem
-server.js-t szétbontani
 mappastruktúrákat kialakítani
 felesleges npm modulokat törölni
 összekötőtábla postgresben (usersxevents)
-typescriptre átírni
+
+typescriptre átírni - dist mappa, tsc watch
+szétszedni config, doc, interface, middleware, routes, services
 routokat szétszedni külön fileokba - megvan
-typescript újratanulás
-middleware, service, interface - jwt auth - kész
+jwt autentikáció - megvan - csak login, auth, reget lehessen elérni alapból
+async functionok bevezetése - elkezdve
+
+
+json kommunikáció - még nincs meg
+sequelize
+

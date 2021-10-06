@@ -1,10 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bcrypt = exports.initialize = void 0;
-var LocalStrategy = require('passport-local').Strategy;
-var bcrypt = require('bcrypt');
-exports.bcrypt = bcrypt;
+var bcrypt_1 = __importDefault(require("bcrypt"));
+exports.bcrypt = bcrypt_1.default;
 var db_config_1 = require("./db.config");
+var LocalStrategy = require('passport-local').Strategy;
 function initialize(passport) {
     console.log("Initialized");
     var authenticateUser = function (email, password, done) {
@@ -18,7 +21,7 @@ function initialize(passport) {
                 var user_1 = results.rows[0];
                 console.log("ezt találtuk: " + results.rows[0].password);
                 console.log("ez a beírt jelszó: " + user_1.password);
-                bcrypt.compare(password, user_1.password, function (err, isMatch) {
+                bcrypt_1.default.compare(password, user_1.password, function (err, isMatch) {
                     if (err) {
                         console.log(err);
                     }

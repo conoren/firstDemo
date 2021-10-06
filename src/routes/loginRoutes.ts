@@ -1,9 +1,9 @@
 import * as DbConfig  from "../config/db.config";
-import * as passportConfig from "../config/passport-config"
+import bcrypt from 'bcrypt';
+import passport from "passport";
+
 const eventExpr = require('express')
-const bcrypt = require('bcrypt')
 const router = new eventExpr.Router()
-const passport = require("passport");
 
 router.get("/", (req, res) => {
   res.render("login.ejs");

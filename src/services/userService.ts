@@ -1,4 +1,3 @@
-//const config = require('config.json');
 const jwt = require('jsonwebtoken');
 
 // ezt majd átváltani postgre-re
@@ -7,12 +6,7 @@ const users = [
     { id: 2, email: 'cecil@gmail.com', password: 'cecilvagyok', firstName: 'Test', lastName: 'User', name: 'Tóth Cecil' }
 ];
 
-module.exports = {
-    authenticate,
-    getAll
-};
-
-async function authenticate({ email, password }) {
+export async function authenticate({ email, password }) {
     const user = users.find(u => u.email === email && u.password === password);
 
     if (!user) throw 'Email or password is incorrect';
@@ -26,11 +20,9 @@ async function authenticate({ email, password }) {
     };
 }
 
-async function getAll() {
+export async function getAll() {
     return users.map(u => omitPassword(u));
 }
-
-// helper functions
 
 function omitPassword(user) {
     const { password, ...userWithoutPassword } = user;

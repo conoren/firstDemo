@@ -1,5 +1,6 @@
 require("dotenv").config();
-const { Pool } = require("pg");
+//const { Pool } = require("pg");
+import {Pool} from 'pg'
 
 const pool = new Pool({
   user:process.env.PGUSER,

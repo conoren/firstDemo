@@ -5,13 +5,12 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import { jwt } from './middlewares/auth'
+import * as passportConfig from './config/passport-config'
+import passport from "passport";
+import flash from "express-flash";
+import session from "express-session";
+import swaggerUi from 'swagger-ui-express';
 
-
-const passportConfig = require("./config/passport-config");
-const passport = require("passport");
-const flash = require("express-flash");
-const session = require("express-session");
-const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./doc/swagger-output.json');
 
 const app = express();
@@ -28,7 +27,7 @@ passportConfig.initialize(passport);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-//app.use(express.urlencoded({ extended: false }));
+
 app.set("view engine", "ejs");
 
 app.use(

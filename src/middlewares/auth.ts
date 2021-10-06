@@ -1,15 +1,13 @@
-const expressJwt = require('express-jwt');
-//const config = require('config.json');
-//require("dotenv").config();
-
-//module.exports = jwt;
+import expressJwt from 'express-jwt';
 
 export function jwt() {
     const secret  = process.env.SESSION_SECRET;
     return expressJwt({ secret, algorithms: ['HS256'] }).unless({
         path: [
             // public routes that don't require authentication
-            '/authenticate'
+            '/authenticate',
+            '/login',
+            '/register'
         ]
     });
 }
