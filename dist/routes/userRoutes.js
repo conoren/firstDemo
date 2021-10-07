@@ -23,6 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
+//import { getAllEvents } from '../services/eventService';
 var userService = __importStar(require("../services/userService"));
 var router = express_1.default.Router();
 // routes
@@ -33,15 +34,28 @@ router.post('/authenticate', function (req, res, next) {
         .catch(next);
 });
 router.get('/getusers', getAll);
-/*function authenticate(req, res, next) {
-    userService.authenticate(req.body)
-        .then(user => res.json(user))
-        .catch(next);
-}*/
 function getAll(req, res, next) {
     userService.getAll()
         .then(function (users) { return res.json(users); })
         .catch(next);
 }
+router.get('/getMyEvents', getAllEvents);
+function getAllEvents(req, res) {
+    userService.getMyEvents()
+        .then(function (myEvents) { return res.json(myEvents); });
+}
+router.post('/joinEvent', function (req, res) {
+    userService.joinEvent(req.body)
+        .then(function (response) { return res.json(response); });
+});
+router.delete('/leaveEvent', function (req, res) {
+    userService.leaveEvent(req.body);
+    res.sendStatus(200);
+});
+/*function authenticate(req, res, next) {
+    userService.authenticate(req.body)
+        .then(user => res.json(user))
+        .catch(next);
+}*/
 exports.default = router;
 //# sourceMappingURL=userRoutes.js.map

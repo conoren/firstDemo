@@ -3,7 +3,7 @@ import * as eventService from '../services/eventService'
 const eventExpr = require('express')
 const router = new eventExpr.Router()
 
-router.get("/eventManager", eventDbConfig.checkNotAuthenticated, (_req: any, res: { render: (arg0: string) => void; }) => {
+router.get("/eventManager", eventDbConfig.checkNotAuthenticated, (_req, res) => {
     console.log("=== EVENT MANAGER ====")
     res.render("eventManager.ejs");
 });
@@ -33,7 +33,7 @@ router.delete('/deleteEvent',(req,res)=>{
     `DELETE FROM events WHERE name=$1`, [name]).then(res.send("event deleted")).catch(err=>{res.status(500).send()})
 })
 
-router.post("/eventAdder", eventDbConfig.checkNotAuthenticated, (req: { body: { name: any; description: any; }; flash: (arg0: string, arg1: string) => void; }, res: { render: (arg0: string, arg1: { errors: { message: string; }[]; name: any; description: any; }) => void; redirect: (arg0: string) => void; }) => {
+router.post("/eventAdder", eventDbConfig.checkNotAuthenticated, (req, res) => {
     let { name, description } = req.body;
   
     let errors: { message: string; }[] = [];
@@ -66,7 +66,7 @@ router.post("/eventAdder", eventDbConfig.checkNotAuthenticated, (req: { body: { 
         }
       );
     }
-  });
+});
   
   router.post("/eventDeleter", eventDbConfig.checkNotAuthenticated, (req,res) => {
     let { name } = req.body;

@@ -10,6 +10,7 @@ jwt autentikáció - megvan - csak login, auth, reget lehessen elérni alapból
 async functionok bevezetése - elkezdve
 
 
-json kommunikáció - még nincs meg
+json kommunikáció - megvan
 sequelize
 
+törlésnél a kapcsolótáblából is töröljön - eventnél és usernél is (usert törölni nem kell)

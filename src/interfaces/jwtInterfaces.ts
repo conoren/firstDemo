@@ -7,13 +7,16 @@ export interface User {
 }
 
 export interface Event {
+    then(arg0: (users: any) => any);
     find(arg0: (u: any) => boolean);
     name: string;
     description: string;
 }
 
 export interface Userxevents {
+    filter(arg0: (e: any) => boolean);
     find(arg0: (u: any) => boolean);
+    id: number;
     userId: number;
     eventName: string;
 }

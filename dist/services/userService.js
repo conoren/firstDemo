@@ -58,7 +58,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAll = exports.authenticate = void 0;
+exports.leaveEvent = exports.joinEvent = exports.getMyEvents = exports.getAll = exports.authenticate = exports.currentUser = void 0;
 var db_config_1 = require("../config/db.config");
 var passport_config_1 = require("../config/passport-config");
 var jwt = require('jsonwebtoken');
@@ -70,12 +70,18 @@ function authenticate(_a) {
             user = db_config_1.users.find(function (u) { return u.email === email && passport_config_1.bcrypt.compare(password, u.password); });
             if (!user)
                 throw 'Email or password is incorrect';
+            else
+                exports.currentUser = user;
             token = jwt.sign({ sub: user.id }, process.env.SESSION_SECRET, { expiresIn: '1h' });
             return [2 /*return*/, __assign(__assign({}, omitPassword(user)), { token: token })];
         });
     });
 }
 exports.authenticate = authenticate;
+function omitPassword(user) {
+    var password = user.password, userWithoutPassword = __rest(user, ["password"]);
+    return userWithoutPassword;
+}
 function getAll() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -84,8 +90,37 @@ function getAll() {
     });
 }
 exports.getAll = getAll;
-function omitPassword(user) {
-    var password = user.password, userWithoutPassword = __rest(user, ["password"]);
-    return userWithoutPassword;
+function getMyEvents() {
+    return __awaiter(this, void 0, void 0, function () {
+        var myEvents;
+        return __generator(this, function (_a) {
+            console.log(db_config_1.usersxevents);
+            myEvents = db_config_1.usersxevents.filter(function (e) { return e.userid === exports.currentUser.id; });
+            console.log(myEvents);
+            return [2 /*return*/, myEvents];
+        });
+    });
 }
+exports.getMyEvents = getMyEvents;
+function joinEvent(body) {
+    return __awaiter(this, void 0, void 0, function () {
+        var joinedEvent;
+        return __generator(this, function (_a) {
+            joinedEvent = db_config_1.usersxevents.filter(function (e) { return e.userid === exports.currentUser.id && e.eventname === body.eventname; });
+            if (!joinedEvent) {
+                db_config_1.pool.query("INSERT INTO usersxevents (userid, eventname) VALUES ($1, $2)", [exports.currentUser.id, body.eventname]);
+            }
+            return [2 /*return*/, joinedEvent];
+        });
+    });
+}
+exports.joinEvent = joinEvent;
+function leaveEvent(body) {
+    var joinedEvent = db_config_1.usersxevents.filter(function (e) { return e.userid === exports.currentUser.id && e.eventname === body.eventname; });
+    if (joinedEvent) {
+        db_config_1.pool.query("DELETE FROM usersxevents WHERE (userid=$1 AND eventname=$2)", [exports.currentUser.id, body.eventname]);
+    }
+    return joinedEvent;
+}
+exports.leaveEvent = leaveEvent;
 //# sourceMappingURL=userService.js.map
